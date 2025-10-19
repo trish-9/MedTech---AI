@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MedTech Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard1.css') }}">
+
+</head>
+<body>
+  <div class="dashboard-container">
+    <header>
+      <h1>Welcome User </h1>
+      <p>MedTech Patient Dashboard</p>
+    </header>
+
+    <div>
+      <h2>📅 Appointments</h2>
+      <table border="10" cellpadding="20" cellspacing="20">
+        <thead>
+          <tr>
+            <th>Doctor</th>
+            <th>Date</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for doctor, date, avs in appointments %}
+            <tr>
+              <td>{{ doctor }}</td>
+              <td>{{ date }}</td>
+              <td>{{ avs }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+      <!-- Vital Monitor -->
+      <div class="card">
+        <h2>🩺 Vital Monitoring</h2>
+        {% if vitals %}
+          <p><strong>Heart Rate:</strong>N/A</p>
+          <p><strong>Blood Pressure:</strong>N/A</p>
+          <p><strong>Oxygen Level:</strong> N/A</p>
+          <p><strong>Temperature:</strong> N/A </p>
+        {% else %}
+          <p>Vital data not available.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mental Health AI — Large Intents Demo (Frontend)</title>
+  <style>
+    :root{
+      --bg:#071126;--card:#0b1724;--accent1:#60a5fa;--accent2:#6ee7b7;--muted:#9fb3c8;--danger:#ff6b6b;--light:#f3f7fb;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0}
+    body{background: radial-gradient(600px 300px at 10% 10%, rgba(96,165,250,0.06), transparent), var(--bg); color:var(--light); display:flex;align-items:center;justify-content:center;padding:28px;}
+    .container{width:1100px; max-width:100%; display:grid; grid-template-columns:420px 1fr; gap:24px; align-items:start;}
+    .left{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.04); padding:20px;border-radius:14px; box-shadow: 0 12px 36px rgba(2,6,23,0.6);}
+    .logo{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+    .badge{width:54px;height:54px;border-radius:12px;background:linear-gradient(135deg,var(--accent2),var(--accent1));display:flex;align-items:center;justify-content:center;color:#052023;font-weight:800}
+    h2{margin:0 0 6px 0;font-size:20px}
+    p.small{color:var(--muted);margin:0 0 12px 0}
+    ul.features{margin-top:10px;color:var(--muted);font-size:14px;padding-left:18px}
+    .chat{background:linear-gradient(180deg, rgba(255, 247, 247, 0.018), rgba(255,255,255,0.008)); border-radius:14px;padding:12px;border:1px solid rgba(255,255,255,0.03); display:flex;flex-direction:column;height:640px;}
+    .chat-header{display:flex;align-items:center;gap:12px;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.02)}
+    .avatar{width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;color:#042023;font-weight:800}
+    .title{font-size:16px;margin:0}
+    .subtitle{font-size:13px;color:var(--muted)}
+    .messages{flex:1;overflow:auto;padding:18px;display:flex;flex-direction:column;gap:12px}
+    .bubble{max-width:78%;padding:12px;border-radius:12px;line-height:1.45}
+    .bubble.user{align-self:flex-end;background:linear-gradient(180deg, rgba(96,165,250,0.14), rgba(96,165,250,0.06));border:1px solid rgba(96,165,250,0.12);color:#dbeafe}
+    .bubble.ai{align-self:flex-start;background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.04);color:#dbeafe}
+    .bubble.ai.strong{background:linear-gradient(180deg, rgba(110,231,183,0.18), rgba(110,231,183,0.08));color:#02160f}
+    .meta{font-size:12px;color:var(--muted);margin-top:6px}
+    .typing{display:flex;gap:6px;align-items:center}
+    .dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.6);opacity:0.7;animation:bounce 1s infinite}
+    .dot:nth-child(2){animation-delay:0.12s}
+    .dot:nth-child(3){animation-delay:0.24s}
+    @keyframes bounce{0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)}}
+    .composer{display:flex;gap:12px;padding:12px;border-top:1px solid rgba(255,255,255,0.02);align-items:center}
+    textarea.input{flex:1;padding:12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);min-height:56px;color:var(--light);resize:none;outline:none}
+    button.send{background:linear-gradient(90deg,var(--accent2),var(--accent1));border:none;padding:12px 16px;border-radius:10px;color:#042023;font-weight:700;cursor:pointer}
+    .connect-panel{position:absolute;left:48px;right:48px;top:80px;bottom:80px;border-radius:12px;padding:22px;display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);backdrop-filter: blur(4px);opacity:0;pointer-events:none;transform:translateY(12px);transition:all 260ms cubic-bezier(.2,.9,.26,1)}
+    .connect-panel.show{opacity:1;pointer-events:auto;transform:translateY(0)}
+    .btn-row{display:flex;gap:12px;margin-top:6px}
+    .btn{padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
+    .btn.call{background:linear-gradient(180deg,var(--danger),#ff8a8a);color:#330303}
+    .btn.video{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#052023}
+    .btn.cancel{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+    .modal{position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(2,6,23,0.6);display:flex;align-items:center;justify-content:center;z-index:60;opacity:0;pointer-events:none;transition:all 200ms}
+    .modal.show{opacity:1;pointer-events:auto}
+    .modal-card{width:860px;max-width:95%;height:520px;background:var(--card);border-radius:14px;padding:12px;border:1px solid rgba(255,255,255,0.03);display:grid;grid-template-columns:1fr 320px;gap:12px}
+    .video-stage{background:rgba(255,255,255,0.02);border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    video{width:100%;height:100%;object-fit:cover;border-radius:8px}
+    .side{padding:12px;color:var(--muted)}
+    .close{background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:16px}
+    @media (max-width:980px){.container{grid-template-columns:1fr;gap:14px}.chat{height:720px}.connect-panel{left:20px;right:20px;top:60px;bottom:60px}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="left">
+      <div class="logo"><div class="badge">MH</div><div><h2>Mental Health — AI Support</h2><p class="small">Confidential listening & triage — large-intent frontend demo. For production, move safety checks server-side.</p></div></div>
+      <ul class="features">
+        <li>• Extensive intent library (~200 intents) for broad coverage</li>
+        <li>• Crisis detection & immediate connect flow</li>
+        <li>• Local video demo (camera preview only)</li>
+        <li>• Easy to extend: add intents in the JS array</li>
+      </ul>
+      <p style="margin-top:12px;color:var(--muted);font-size:13px">Deployment note: This is a demo. For a public site you should implement server-side filters, consent, secure storage, and integrate a telehealth provider for live clinician callouts.</p>
+    </div>
+
+    <div class="chat" id="chatWrap" aria-label="Mental Health chat">
+      <div class="chat-header"><div class="avatar">AI</div><div><div class="title">Support AI</div><div class="subtitle">Compassionate listening • Instant assistance</div></div></div>
+
+      <div class="messages" id="messages" aria-live="polite" role="log"></div>
+
+      <div class="composer">
+        <textarea id="input" class="input" placeholder="Write what's on your mind... (press Enter to send)"></textarea>
+        <button class="send" id="sendBtn">Send</button>
+      </div>
+
+      <div class="connect-panel" id="connectPanel" aria-hidden="true" role="dialog" aria-modal="true">
+        <h3 style="margin:0;color:var(--danger)">Immediate Support Recommended</h3>
+        <p style="color:var(--muted);max-width:720px;text-align:center">We detected language that suggests you might be in crisis. You can call emergency services, call a helpline, or start a live video demo below.</p>
+        <div class="btn-row">
+          <a class="btn call" id="callNow" href="tel:+919876543210">Call Now • +91 98765 43210</a>
+          <button class="btn video" id="videoBtn">Start Video Call (Demo)</button>
+          <button class="btn cancel" id="dismissBtn">Maybe later</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- modal -->
+  <div class="modal" id="modal">
+    <div class="modal-card" role="document" aria-label="Video demo">
+      <div class="video-stage" id="videoStage">
+        <div id="videoText" style="text-align:center;color:var(--muted);padding:18px">
+          <div style="font-size:16px;margin-bottom:8px">Video preview (demo)</div>
+          <div style="font-size:13px">Allow camera & mic. This is only a local preview — not a clinician connection.</div>
+        </div>
+        <video id="localVideo" autoplay playsinline muted style="display:none"></video>
+      </div>
+      <div class="side">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <strong style="color:var(--light)">Live Call (Demo)</strong>
+          <button class="close" id="closeModal">✕</button>
+        </div>
+        <p style="margin-top:8px;color:var(--muted)">Demo uses your local camera and mic. For real telehealth integrate a provider and consent flow.</p>
+        <div style="margin-top:12px">
+          <button id="muteBtn" class="btn cancel">Mute</button>
+          <button id="endBtn" class="btn call">End Demo</button>
+        </div>
+        <div style="margin-top:18px;color:var(--muted);font-size:13px">
+          <div><strong>Clinician on-call:</strong> Dr. Anita Sharma</div>
+          <div>Specialty: Psychiatry</div>
+          <div>Availability: 24/7 (demo)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/*
+  Large front-end only chatbot with an extensive intents array (~200 entries).
+  - To expand: add objects to intents.
+  - Each intent: { patterns: [...], response: '...', urgent?: true/false, meta?: '...' }
+  - Matching uses word-boundary regex and phrase contains scoring.
+  - Urgent flow triggers connect panel.
+  - This is a client-side demo. Do not rely on client-side safety in production.
+*/
+
+const intents = [
+  // 1-20: core mood & emotions
+  {patterns:['sad','depressed','down','feeling low','hopeless','tearful','crying','miserable','blue'], response:"I’m really sorry you’re feeling low. If it helps, can you share one small thing that felt okay today?"},
+  {patterns:['anxiety','anxious','panic','panicking','nervous','worried','overwhelmed','stress','stressed'], response:"I hear you — anxiety can be intense. Try breathing in for 4, hold 4, out for 6. Want a guided breathing now?"},
+  {patterns:['suicide','kill myself','want to die','end my life','die by suicide','i cant go on','overdose','cut myself','self-harm'], response:"I’m very sorry — I’m concerned about your safety. If you are in danger, please call emergency services now.", urgent:true},
+  {patterns:['lonely','alone','isolation','isolated'], response:"Feeling lonely is really painful. Would you like ideas for small ways to connect with someone safely?"},
+  {patterns:['guilty','guilt','ashamed','embarrassed'], response:"Guilt and shame can be heavy. Sometimes writing down what you feel and what you learned can help. Want a journaling prompt?"},
+  {patterns:['angry','irritated','frustrated','mad','furious'], response:"Anger is natural. Taking a break and breathing can help calm intense moments. Want a quick grounding trick?"},
+  {patterns:['happy','joy','excited','good','great','relieved'], response:"I’m glad to hear something’s going well. Tell me more about that positive moment!"},
+  {patterns:['confused','lost','unsure','uncertain'], response:"Uncertainty is stressful. We can break things down into small steps — what’s the most immediate thing on your mind?"},
+  {patterns:['hopeful','optimistic','positive'], response:"Hope is powerful. What contributed to that feeling today?"},
+  {patterns:['numb','detached','empty'], response:"Feeling numb or disconnected can be worrying. Sometimes gentle routines and small, soothing activities help. Want suggestions?"},
+  {patterns:['grief','grieving','bereaved','loss','lost my','passed away'], response:"I’m so sorry for your loss. Grief is personal; sharing a memory can sometimes help. Would you like to talk about them?"},
+  {patterns:['guilt over suicide','survivor guilt'], response:"Survivor guilt is complex and painful. You don’t have to carry it alone; talking to a clinician or support group can help."},
+  {patterns:['helpless','hopeless','cant cope','i give up'], response:"I’m sorry you feel that way. If it’s very intense, please consider contacting emergency services or a crisis line."},
+  {patterns:['relieved','relief'], response:"Relief can be an important emotion — what helped bring a sense of relief?"},
+  {patterns:['jealous','envy'], response:"Jealousy and envy are common. Naming specific triggers can help you respond differently — want to try that?"},
+  {patterns:['optimism','resilience'], response:"Resilience grows with small steps. What’s one tiny thing you did recently you can be proud of?"},
+  {patterns:['resentful','bitter'], response:"Holding resentment is heavy; sometimes expressing the feeling safely (journal, therapy) helps."},
+  {patterns:['regret','remorse'], response:"Regret hurts. It can help to consider small reparative actions if appropriate — or working with a therapist to process it."},
+  {patterns:['vulnerable','exposed'], response:"Feeling vulnerable is scary. You're showing strength by recognizing it — would you like grounding steps?"},
+
+  // 21-40: anxiety spectrum & panic
+  {patterns:['panic attack','panic attacks','having a panic attack'], response:"If you’re having a panic attack: ground yourself — 5 things you can see, 4 you can touch, 3 you can hear, 2 you can smell, 1 you can taste. Breathe slowly."},
+  {patterns:['social anxiety','social phobia','afraid of people','cant talk to people'], response:"Social anxiety can make things feel risky. Small exposures and breathing can help. Want a small step you can try?"},
+  {patterns:['performance anxiety','stage fright','presentation anxiety'], response:"Performance nerves are common. Practice and controlled breathing helps. Want a short rehearsal script?"},
+  {patterns:['health anxiety','hypochondria','im dying','im sick'], response:"Health worries can feel overwhelming. A medical check and grounding while waiting often helps. Would you like relaxation steps?"},
+  {patterns:['obsessive thoughts','ocd','intrusive thoughts','cant stop thinking'], response:"Intrusive thoughts are distressing but common. Labeling them and refocusing helps; therapy (ERP/CPT) can assist long-term."},
+  {patterns:['phobia','fear of','afraid of spiders','fear of flying'], response:"Phobias are intense; gradual exposure under guidance can reduce fear. Want coping tips for a specific phobia?"},
+  {patterns:['panic attack triggers','panic triggers'], response:"Identifying triggers helps reduce panic. Can you describe what happened before the feeling started?"},
+  {patterns:['anxiety about future','future worries'], response:"Future worries often involve uncertainty. Small planning and a focus on controllables can help."},
+  {patterns:['catastrophize','catastrophic thinking'], response:"Catastrophizing makes problems look larger than they are. We can reframe step-by-step if you'd like."},
+  {patterns:['breathing problems due to anxiety','hyperventilating'], response:"If hyperventilating, try slow diaphragmatic breathing: hands on belly, inhale 4s, exhale 6s."},
+
+  // 41-60: sleep, appetite, somatic
+  {patterns:['insomnia','cant sleep','sleepless','trouble sleeping','sleep problems'], response:"Sleep disruption is common when stressed. Routine, dim lights, and no screens 30 mins before bed help."},
+  {patterns:['nightmares','bad dreams','night terrors'], response:"Nightmares are distressing. Grounding before bed and a calming routine can reduce frequency; therapy helps for recurrent trauma dreams."},
+  {patterns:['fatigue','tired all the time','low energy'], response:"Chronic tiredness can be from mood, sleep, or health. Small activity bursts and good sleep hygiene may help — want a plan?"},
+  {patterns:['loss of appetite','not eating','no appetite'], response:"Changes in appetite can be related to mood. Try small, regular meals and reach out if it persists."},
+  {patterns:['overeating','binge','eating too much','binge eating'], response:"Binge eating is often a coping strategy. Support and structured help can reduce episodes."},
+  {patterns:['nausea from anxiety','stomach ache from stress'], response:"Anxiety can cause tummy issues. Grounding and slow breathing can ease symptoms."},
+  {patterns:['palpitations','heart racing','chest tightness'], response:"Palpitations can be anxiety-related but check with a doctor for safety if severe."},
+  {patterns:['headache from stress','tension headache'], response:"Tension headaches respond to relaxation, posture breaks, and hydration. Short neck stretches help."},
+  {patterns:['muscle tension','stiffness'], response:"Progressive muscle relaxation can relieve tension — want a guided version?"},
+  {patterns:['somatic symptoms','bodily symptoms without cause'], response:"Somatic symptoms are real and distressing; medical and psychological assessment can help identify causes."},
+
+  // 61-80: relationships & family
+  {patterns:['breakup','broke up','divorce','relationship ended','heartbroken'], response:"Breakups sting. Small routines and leaning on supportive people can help over time."},
+  {patterns:['infidelity','cheating','betrayal'], response:"Betrayal breaks trust deeply. Therapy and clear boundaries help process what to do next."},
+  {patterns:['domestic violence','abuse','abusive relationship','dont feel safe'], response:"If you’re in danger, call emergency services. There are shelters and hotlines that can help; your safety is priority.", urgent:true},
+  {patterns:['co-parenting conflict','shared custody','child custody'], response:"Co-parenting is hard. Prioritize the child's needs and consider mediation."},
+  {patterns:['parenting stress','kids behaviours','child acting out'], response:"Parenting is demanding. Routines, small positive reinforcement, and seeking parental support can help."},
+  {patterns:['teen mental health','my teen depressed','teen self harm'], response:"If a child is at risk, seek urgent pediatric/psychiatric help. Early support matters.", urgent:true},
+  {patterns:['lonely in relationship','feeling alone in relationship'], response:"Feeling emotionally disconnected can be addressed by open, calm conversations or couples therapy."},
+  {patterns:['family conflict','family fights','family problems'], response:"Family conflicts often need boundaries and mediated communication."},
+  {patterns:['in laws problem','in-law issues'], response:"In-law tensions are common; clear boundaries and respectful limits often help."},
+  {patterns:['homelessness','no place to live'], response:"Housing insecurity is severe. Local social services can help; do you want resources?"},
+
+  // 81-100: work, study, career
+  {patterns:['work stress','job stress','burnout','overworked'], response:"Burnout needs rest, boundaries, and sometimes workload changes. Want a recovery checklist?"},
+  {patterns:['unemployment','lost job','fired'], response:"Losing a job is stressful. Practical next steps and support networks can help."},
+  {patterns:['work harassment','bullying at work','harassed at work'], response:"Workplace harassment is serious — document incidents and contact HR or labor services."},
+  {patterns:['study stress','exam stress','cant concentrate','study anxiety'], response:"Break tasks into small chunks and schedule focused intervals with breaks."},
+  {patterns:['imposter syndrome','dont deserve success','not good enough'], response:"Imposter feelings are common. Listing objective achievements can help reframe."},
+  {patterns:['career change','career confusion','what job to do'], response:"Career transitions are big steps — exploring values and skills helps. Want a guided worksheet?"},
+  {patterns:['boss stressful','difficult manager','micromanaged'], response:"Document issues, seek HR support, and prioritize self-care while deciding next steps."},
+  {patterns:['quit job fear','afraid to quit'], response:"Weigh pros/cons, financials, and safety; small planning reduces risk."},
+  {patterns:['work-life balance','too much work'], response:"Set boundaries, schedule personal time, and communicate availability."},
+  {patterns:['performance review anxiety','review fear'], response:"Prepare examples of achievements and focus on learning; practice a calm script."},
+
+  // 101-120: trauma, PTSD, sexual assault
+  {patterns:['trauma','ptsd','flashbacks','nightmares about trauma'], response:"Trauma responses are real. Trauma-informed therapy (EMDR / CPT) can help. If you're in danger, seek urgent care.", meta:"Trauma-informed care recommended"},
+  {patterns:['sexual assault','rape','molested','assaulted'], response:"I’m so sorry. If you’re in immediate danger, call emergency services. There are sexual assault centers offering support and medical care.", urgent:true},
+  {patterns:['childhood abuse','abused as a child','molested as a child'], response:"Childhood abuse has long-term impact. Therapy with a trauma-informed clinician can help."},
+  {patterns:['flashback triggers','sudden flashback'], response:"Grounding and safe-space techniques can help during a flashback. Are you safe right now?"},
+  {patterns:['dissociation','feeling unreal','out of body'], response:"Dissociation can be a trauma response; grounding techniques and professional support can help."},
+  {patterns:['complex trauma','cptsd'], response:"Complex trauma often needs long-term, trauma-focused therapy."},
+  {patterns:['survivor guilt','guilt after trauma'], response:"Survivor guilt is painful — therapy and peer support can help process it."},
+  {patterns:['trauma triggers in daily life'], response:"Identify triggers, create a safety plan, and practice grounding when triggered."},
+  {patterns:['seeking trauma therapist','how to find trauma therapist'], response:"Look for 'trauma-informed therapist' or ask local mental health directories; I can give search tips."},
+  {patterns:['sudden panic after trauma'], response:"If panic or danger, seek emergency care; otherwise grounding steps may help."},
+
+  // 121-140: substance & addictive behaviours
+  {patterns:['alcohol','drinking too much','i drink too much'], response:"Using alcohol to cope is common; support and treatment options exist. Would you like resources or harm-reduction tips?"},
+  {patterns:['drugs','drug use','using drugs','stoned','high'], response:"Substance use can be risky. Treatment and harm-reduction support can help if you want it."},
+  {patterns:['quit drinking','stop drinking','sobriety help'], response:"Quitting is hard but possible. Support groups, medical advice, and small step planning help."},
+  {patterns:['withdrawal symptoms','detox symptoms'], response:"Withdrawal can be dangerous for some substances — medical supervision is recommended."},
+  {patterns:['gambling','gambling problem','compulsive gambling'], response:"Gambling problems have support and treatment options; would you like steps to find help?"},
+  {patterns:['porn addiction','compulsive sexual behaviour'], response:"Compulsive behaviours can be addressed with specialized therapy and peer support."},
+  {patterns:['smoking quit help','quit smoking'], response:"Small steps, nicotine replacement, and counseling increase quit success."},
+  {patterns:['shopping addiction','compulsive shopping'], response:"Compulsive shopping often follows emotional patterns; therapy and budgeting help."},
+  {patterns:['video game addiction','gaming too much'], response:"Set scheduled play times, break tasks into goals, and seek balance; therapy helps if control is lost."},
+  {patterns:['relapse','relapsed after quitting'], response:"Relapse is not failure — it's a signal to adjust the plan and get supportive care."},
+
+  // 141-160: medical & medication
+  {patterns:['medication side effects','side effects of meds','not taking meds'], response:"Medication concerns are important. Talk to your prescriber before changing doses; seek urgent care if severe."},
+  {patterns:['antidepressant','ssri','zoloft','prozac'], response:"Antidepressants help many; discuss benefits & side effects with your prescriber."},
+  {patterns:['stop meds','stopped meds suddenly'], response:"Stopping some psychiatric meds abruptly can be risky — contact your prescriber."},
+  {patterns:['therapy vs meds','should i take meds or therapy'], response:"Both can help; personalized care with a clinician decides best options."},
+  {patterns:['psychotic symptoms','hearing voices','seeing things'], response:"If experiencing hallucinations, seek urgent medical/psychiatric assessment.", urgent:true},
+  {patterns:['chronic pain','pain management','long term illness'], response:"Chronic illness impacts mood; pacing, multidisciplinary care, and support help."},
+  {patterns:['panic disorder diagnosis','diagnosed with ocd','diagnosis questions'], response:"Diagnosis can clarify treatment; a clinician can explain options and next steps."},
+  {patterns:['sleep meds','sleeping pills help'], response:"Sleep meds sometimes help short-term; discuss risks and alternatives with a doctor."},
+  {patterns:['therapy frequency how often','how often to see therapist'], response:"Weekly sessions often start therapy; frequency depends on need and progress."},
+
+  // 161-180: identity, orientation, discrimination
+  {patterns:['lgbt','lgbtq','gay','lesbian','bisexual','trans','queer','coming out'], response:"Identity exploration can be stressful. Support groups and affirming clinicians help. Want resources?"},
+  {patterns:['homophobia','transphobia','discrimination at work','racism affecting me'], response:"Discrimination is harmful. Seek support and document incidents; community groups can help."},
+  {patterns:['religious conflict','faith crisis'], response:"Faith struggles can be painful; talking with a trusted person or chaplain can help."},
+  {patterns:['identity crisis','who am i','lost identity'], response:"Identity questions take time; exploring values and safe communities helps."},
+  {patterns:['sexual orientation confusion','am i gay','am i trans'], response:"Questioning is normal. Take your time and seek supportive people or groups."},
+  {patterns:['trans support','transgender mental health'], response:"Affirming care is important. Look for trans-competent clinicians and peer support."},
+  {patterns:['coming out fear','afraid to come out'], response:"Take steps when you feel safe; plan supports and consider trusted allies first."},
+
+  // 181-200: legal, finance, safety, miscellaneous
+  {patterns:['legal trouble','court','lawsuit','arrested'], response:"Legal issues are stressful; seek legal counsel and manage mental health with support."},
+  {patterns:['debt','financial stress','cant pay bills','money problems'], response:"Financial strain causes major stress. Practical budgeting and seeking debt advice services can help."},
+  {patterns:['safety concerns','dont feel safe','threatened'], response:"If you or others are in immediate danger, call emergency services now.", urgent:true},
+  {patterns:['suicide support hotlines','suicide hotline'], response:"If you need urgent help, call your local crisis line or emergency services. If you tell me your country, I can offer a helpline number (demo)."},
+  {patterns:['moving to new city','relocation stress','homesick'], response:"Adjustment takes time. Establishing routines and local contacts helps ease the transition."},
+  {patterns:['creative block','writers block','no inspiration'], response:"Small prompts and short timed writing sessions can restart creativity. Want a prompt?"},
+  {patterns:['time management','procrastination','cant start tasks'], response:"Use 10-minute timers and small goals to reduce avoidance."},
+  {patterns:['relationship counseling','couples therapy'], response:"Couples therapy can improve communication; finding a qualified therapist helps."},
+  {patterns:['gratitude','gratitude practice'], response:"Gratitude exercises can shift focus; try listing 3 things you're thankful for daily."},
+  {patterns:['mindfulness','meditation','grounding exercises'], response:"Short mindfulness exercises help reduce stress. Want a 2-minute guided practice?"},
+
+  // 201-220: fallback expansions & variants for coverage
+  {patterns:['i feel lost','i dont know what to do','im confused what to do'], response:"It’s okay to feel lost. Let’s break things into one small step you could try right now."},
+  {patterns:['i cant cope','i cant handle this','this is too much'], response:"When everything feels too much, focus on immediate safety and one small coping step — breathe and reach out."},
+  {patterns:['my friend suicidal','friend wants to die','someone told me they will kill themselves'], response:"If someone else is in danger, encourage them to seek emergency help and contact local crisis services; if imminent danger call emergency services.", urgent:true},
+  {patterns:['i feel guilty for leaving','guilt about leaving job','guilt after breakup'], response:"Guilt can take time; reflect on reasons and boundaries that led to your choices."},
+  {patterns:['im drinking to cope','i use alcohol to forget'], response:"Using substances to numb pain is common. There are safer options and support to reduce use."},
+  {patterns:['how to find therapist','therapist near me','find counselor'], response:"Search local directories, ask for referrals, and check qualifications; I can give a step-by-step search checklist."},
+  {patterns:['how to help someone depressed','support a friend depressed'], response:"Offer listening, encourage professional help, check safety, and support them with practical tasks."},
+  {patterns:['what is cbt','what is emdr','therapy types'], response:"CBT focuses on thoughts and behaviors; EMDR is trauma-focused. I can summarize each in a few lines."},
+  {patterns:['i experienced trauma recently','recent traumatic event'], response:"If you feel unsafe or overwhelmed, seek urgent care. For processing, trauma-focused therapy is recommended."},
+  {patterns:['i dont trust therapy','scared of therapy','therapy stigma'], response:"It’s normal to feel hesitant. You can try short-term approaches and a therapist who matches your values."}
+];
+
+// Utility helpers
+function escapeRegex(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+function escapeHtml(s){ if(!s) return ''; return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// Matching function: returns {intent,score}
+function matchIntent(text){
+  const t = text.toLowerCase();
+  let best = null, bestScore = 0;
+  for(const intent of intents){
+    let score = 0;
+    for(const p of intent.patterns){
+      if(!p) continue;
+      if(t.includes(p)) score += 3;
+      const re = new RegExp('\\b' + escapeRegex(p) + '\\b', 'i');
+      if(re.test(t)) score += 6;
+    }
+    if(score > bestScore){ bestScore = score; best = intent; }
+  }
+  return {intent:best, score:bestScore};
+}
+
+// Urgent detection keywords (strict)
+const urgentKeywords = ['suicide','kill myself','want to die','end my life','overdose','hurt myself','i cant go on','im going to kill myself','kill yourself','i will kill myself'];
+
+function detectUrgent(text){
+  const t = text.toLowerCase();
+  for(const w of urgentKeywords) if(t.includes(w)) return true;
+  if(t.includes('emergency') || t.includes('help me now')) return true;
+  return false;
+}
+
+// UI wiring
+const messagesEl = document.getElementById('messages');
+const inputEl = document.getElementById('input');
+const sendBtn = document.getElementById('sendBtn');
+const connectPanel = document.getElementById('connectPanel');
+const dismissBtn = document.getElementById('dismissBtn');
+const videoBtn = document.getElementById('videoBtn');
+const callNow = document.getElementById('callNow');
+const modal = document.getElementById('modal');
+const localVideo = document.getElementById('localVideo');
+const videoText = document.getElementById('videoText');
+const closeModal = document.getElementById('closeModal');
+const endBtn = document.getElementById('endBtn');
+const muteBtn = document.getElementById('muteBtn');
+
+function appendBubble(text, who='ai', options={}){
+  const div = document.createElement('div');
+  div.className = 'bubble ' + (who === 'user' ? 'user' : 'ai');
+  if(who === 'ai' && options.strong) div.classList.add('strong');
+  div.innerHTML = '<div>' + escapeHtml(String(text)).replace(/\n/g,'<br>') + '</div>';
+  if(options.meta){
+    const m = document.createElement('div');
+    m.className = 'meta';
+    m.textContent = options.meta;
+    div.appendChild(m);
+  }
+  messagesEl.appendChild(div);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function showTyping(){
+  hideTyping();
+  const wrap = document.createElement('div');
+  wrap.className = 'bubble ai typing';
+  wrap.id = 'typing';
+  wrap.innerHTML = '<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+  messagesEl.appendChild(wrap);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+function hideTyping(){ const t = document.getElementById('typing'); if(t) t.remove(); }
+
+// send handling
+sendBtn.addEventListener('click', onSend);
+inputEl.addEventListener('keydown', e => { if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); onSend(); } });
+
+function onSend(){
+  const text = inputEl.value.trim();
+  if(!text) return;
+  appendBubble(text, 'user');
+  inputEl.value = '';
+  const urgent = detectUrgent(text);
+  showTyping();
+  setTimeout(() => {
+    hideTyping();
+    const match = matchIntent(text);
+    if(urgent || (match.intent && match.intent.urgent)){
+      appendBubble("Thanks for telling me. I detect that this may need urgent support. Please consider connecting with a clinician or emergency services right away.", 'ai', {meta:'Suggested action: Connect now', strong:true});
+      connectPanel.classList.add('show'); connectPanel.setAttribute('aria-hidden','false');
+      appendBubble('If you are in immediate danger, call local emergency services or your crisis line now.', 'ai', {strong:true});
+    } else if(match.intent && match.score > 6){
+      appendBubble(match.intent.response, 'ai', {meta: match.intent.meta || ''});
+    } else {
+      const fallbacks = [
+        "I hear you. Tell me more about when this started and what, if anything, helped even a little.",
+        "Thanks for sharing. Can you tell me how intense this feels on a scale from 1 to 10?",
+        "I’m listening — what happened most recently that made you feel this way?"
+      ];
+      appendBubble(fallbacks[Math.floor(Math.random()*fallbacks.length)], 'ai');
+    }
+  }, 700 + Math.random()*900);
+}
+
+// initial greeting
+setTimeout(()=>{ appendBubble("Hi — I’m here to listen. What would you like to share today?", 'ai'); }, 500);
+
+// connect panel handlers
+dismissBtn.addEventListener('click', ()=>{ connectPanel.classList.remove('show'); connectPanel.setAttribute('aria-hidden','true'); });
+
+// Video demo
+let stream = null, audioEnabled = true;
+videoBtn.addEventListener('click', async () => {
+  modal.classList.add('show');
+  videoText.style.display = 'none';
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({video:true, audio:true});
+    localVideo.srcObject = stream;
+    localVideo.style.display = 'block';
+    audioEnabled = true;
+    muteBtn.textContent = 'Mute';
+  } catch(err){
+    videoText.style.display = 'block';
+    videoText.innerHTML = '<div style="color:var(--danger)">Camera/mic access denied or unavailable. Please allow camera & microphone.</div>';
+  }
+});
+closeModal.addEventListener('click', endDemo);
+endBtn.addEventListener('click', endDemo);
+muteBtn.addEventListener('click', () => {
+  if(!stream) return;
+  const tracks = stream.getAudioTracks();
+  if(tracks.length){
+    audioEnabled = !audioEnabled;
+    tracks.forEach(t => t.enabled = audioEnabled);
+    muteBtn.textContent = audioEnabled ? 'Mute' : 'Unmute';
+  }
+});
+function endDemo(){
+  modal.classList.remove('show');
+  if(stream){ stream.getTracks().forEach(t => t.stop()); stream = null; }
+  localVideo.srcObject = null;
+  localVideo.style.display = 'none';
+  videoText.style.display = 'block';
+  videoText.innerHTML = '<div style="font-size:16px;margin-bottom:8px">Video preview (demo)</div><div style="font-size:13px">Allow camera & mic. This is only a local preview — not a clinician connection.</div>';
+}
+
+// accessibility
+window.addEventListener('keydown', e => { if(e.key === '/') { e.preventDefault(); inputEl.focus(); } });
+
+// before unload safety
+window.addEventListener('beforeunload', (e) => {
+  if(connectPanel.classList.contains('show')){
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+
+/*
+  Extending the intents:
+  - To add more intents: push an object to intents with patterns array & response
+  - Consider using a JSON file for very large libraries to keep HTML smaller
+  - For production: send each message to server, run robust classifiers, and use an LLM for reply generation with server-side safety filters
+*/
+</script>
+</body>
+</html

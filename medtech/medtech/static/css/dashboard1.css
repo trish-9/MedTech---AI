@@ -1,0 +1,47 @@
+/* dashboard.css */
+
+/* Base styles for table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-family: Arial, sans-serif;
+  animation: fadeInTable 1s ease;
+}
+
+/* Table header */
+thead {
+  background-color: #2c3e50;
+  color: white;
+}
+
+/* Table rows */
+tbody tr {
+  background-color: #ecf0f1;
+  color: black;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  opacity: 0;
+  animation: fadeInRow 0.6s forwards;
+}
+
+/* Animate each row with a delay */
+tbody tr:nth-child(1) { animation-delay: 0.2s; }
+tbody tr:nth-child(2) { animation-delay: 0.4s; }
+tbody tr:nth-child(3) { animation-delay: 0.6s; }
+/* Add more as needed or use JS for dynamic delays */
+
+/* Hover effect */
+tbody tr:hover {
+  background-color: #dcdde1;
+  transform: scale(1.01);
+}
+
+/* Table animation keyframes */
+@keyframes fadeInTable {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInRow {
+  to { opacity: 1; }
+}

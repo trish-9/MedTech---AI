@@ -1,0 +1,69 @@
+body {
+  font-family: 'Poppins', sans-serif;
+  background: #0b132b;
+  color: #fff;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background: #1c2541;
+  text-align: center;
+  padding: 1rem;
+  font-size: 1.5rem;
+  box-shadow: 0 0 10px #1c2541;
+}
+
+main {
+  width: 90%;
+  margin: auto;
+  padding: 2rem;
+}
+
+.add-section input {
+  margin: 5px;
+  padding: 8px;
+  border: none;
+  border-radius: 5px;
+}
+
+.add-section button {
+  margin: 5px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  background: #3a506b;
+  color: white;
+  cursor: pointer;
+}
+
+.add-section button:hover {
+  background: #5bc0be;
+}
+
+table {
+  width: 100%;
+  margin-top: 1rem;
+  border-collapse: collapse;
+  background: #1c2541;
+}
+
+th, td {
+  padding: 10px;
+  border-bottom: 1px solid #3a506b;
+  text-align: center;
+}
+
+canvas {
+  background: #1c2541;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+.insight {
+  background: #3a506b;
+  margin-top: 2rem;
+  padding: 1rem;
+  border-radius: 10px;
+}

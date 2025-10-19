@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MedTech AI — Vitals Monitoring</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/vit.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header>
+    <h1>🩺 MedTech AI — Vitals Monitoring Dashboard</h1>
+  </header>
+
+  <main>
+    <section class="add-section">
+      <h2>Add Vitals</h2>
+      <input type="number" id="bp" placeholder="BP (mmHg)">
+      <input type="number" id="hr" placeholder="Heart Rate (bpm)">
+      <input type="number" id="spo2" placeholder="SpO₂ (%)">
+      <button onclick="addVital()">Add</button>
+      <button onclick="simulate()">Simulate Device</button>
+    </section>
+
+    <section>
+      <canvas id="vitalsChart"></canvas>
+    </section>
+
+    <section class="insight">
+      <h2>AI Health Insight</h2>
+      <div id="insight"></div>
+    </section>
+
+    <section>
+      <h2>Vitals History</h2>
+      <table id="vitalsTable">
+        <thead>
+          <tr><th>Date</th><th>BP</th><th>Heart Rate</th><th>SpO₂</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='css/script.js') }}"></script>
+</body>
+</html>

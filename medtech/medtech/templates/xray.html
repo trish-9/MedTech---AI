@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XRAY FILE PREDICTION REPORT</title>
+    <!-- Load Tailwind CSS via CDN for modern, responsive styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom font and base styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background:linear-gradient(135deg, #0f2027,#203a43,#2c5364); 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        /* Styling the native file input's container for better visual appeal */
+        .file-input-container {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            border: 2px dashed #a5b4fc; /* Tailwind indigo-300 */
+            border-radius: 0.75rem;
+            background-color: #eef2ff; /* Tailwind indigo-50 */
+            text-align: center;
+        }
+        
+        /* Custom interactive button styling */
+        .btn-interactive {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+        }
+        .btn-interactive:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+        }
+        .btn-interactive:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main Card Container -->
+    <div class="w-full max-w-lg bg-white p-6 sm:p-10 rounded-2xl shadow-2xl border border-gray-200">
+        <h1 class="text-3xl font-extrabold text-gray-900 mb-8 text-center border-b pb-4">
+            XRAY AI REPORT 
+        </h1>
+
+        <!-- 
+            CORE FORM STRUCTURE for non-AJAX submission:
+            1. method="POST"
+            2. enctype="multipart/form-data" (CRUCIAL for files)
+            3. action="/upload" (The Flask endpoint we define below)
+        -->
+        <form method="POST" enctype="multipart/form-data" action="/upload_xray">
+            <div class="upload-section space-y-6">
+                
+                <!-- 
+                    File Input - Now VISIBLE 
+                -->
+                <div class="file-input-container">
+                    <label for="fileInputNoJS" class="text-gray-700 font-semibold mb-2 block">
+                        📂 Select your file (Image or PDF):
+                    </label>
+                    <input 
+                        type="file" 
+                        id="fileInputNoJS" 
+                        name="file" 
+                        accept="image/*, application/pdf" 
+                        required 
+                        class="p-2 w-full text-gray-800 bg-white border border-gray-300 rounded-lg cursor-pointer"
+                    />
+                </div>
+                
+                <!-- Placeholder for Camera/Scan (still disabled) -->
+                <button type="button" disabled class="w-full py-4 bg-gray-200 text-gray-500 font-semibold rounded-xl cursor-not-allowed opacity-75">
+                    📸 Scan with Camera
+                </button>
+                
+                <!-- Button to Submit (type="submit" triggers the form POST) -->
+                <button type="submit" class="btn-interactive w-full py-4 bg-green-500 text-white font-bold text-lg rounded-xl shadow-xl hover:bg-green-600 transition duration-150">
+                    ⬆️ Submit File</button>
+                <p>{{result1}}</p>
+
+            </div>
+        </form>
+
+        <!-- Status Area -->
+        <div class="mt-8 p-4 text-sm rounded-xl text-center font-medium border border-transparent min-h-[50px] bg-gray-50">
+            Form submission will cause a page refresh/redirect.
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctor Appointment - Dark Theme</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/trsiham.css') }}">
+</head>
+<body>
+  <section class="appointment-section">
+    <div class="appointment-box">
+      <h2>Book Your Appointment</h2>
+      <form method="POST" action="{{ url_for('yug') }}">
+        <label for="name">Patient Name</label>
+        <input type="text" id="name" name="name" placeholder="Enter your name" required>
+
+        <label for="phone">Phone Number</label>
+        <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" required>
+
+        <label for="doctorType">Doctor Type</label>
+        <select id="doctorType" name="doctorType" required>
+          <option value="">-- Select Type --</option>
+          <option value="Cardiologist">Cardiologist ❤️</option>
+          <option value="Neurologist">Neurologist 🧠</option>
+          <option value="Dermatologist">Dermatologist 🩹</option>
+          <option value="Orthopedic">Orthopedic 🦴</option>
+          <option value="Pediatrician">Pediatrician 👶</option>
+        </select>
+
+        <label for="doctorName">Doctor Name</label>
+        <select id="doctorName" name="doctorName" required>
+          <option value="">-- Choose Doctor --</option>
+          <option value="Dr. Sharma (Cardiologist)">Dr. Sharma (Cardiologist)</option>
+          <option value="Dr. Gupta (Neurologist)">Dr. Gupta (Neurologist)</option>
+          <option value="Dr. Mehta (Orthopedic)">Dr. Mehta (Orthopedic)</option>
+          <option value="Dr. Verma (Pediatrician)">Dr. Verma (Pediatrician)</option>
+        </select>
+
+        <label for="slots">slots</label>
+        <select id="slots" name="slots" required>
+          <option value="">-- Choose Time --</option>
+          <option value="09:00 AM">09:00 AM</option>
+          <option value="10:30 AM">10:30 AM</option>
+          <option value="12:30 AM">12:30 AM</option>
+          <option value="1:30 PM">1:30 PM</option>
+          <option value="02:00 PM">02:00 PM</option>
+          <option value="04:30 PM">04:30 PM</option>
+        </select>
+        
+
+        <div class="form-group">
+            <label for="appointmentDate">Appointment Date</label>
+            <input type="date" id="appointmentDate" name="appointmentDate" required>
+        </div>
+
+        <button type="submit">Book Now</button>
+        {%if form_submitted %}
+             {%if solt == 1 %}
+                  <p style="color: green;">✅ Successfully Booked</p>
+             {%endif %}
+             {% if solt == 0 %}
+                 <p1 style = "color : red ; "> ✅The Available solts</p>
+                 {%for sult in av_slot %}
+                 
+                  
+                    <p2>{{sult}}</p2>
+                 
+                 
+                  {% endfor %}
+                  
+                  
+             {%endif %}
+        {%endif %}
+      </form>
+    </div>
+  </section>
+
+ 
+</body>
+</html>
