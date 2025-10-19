@@ -7,9 +7,7 @@ import pandas as pd
 
 
 # Your Account SID and Auth Token from twilio.com/console
-account_sid = 'ACbb8c0db090449cb463e2b6e47dac9890'
-auth_token = '7de828614109f8367c172c5bbfc0b55d'
-client = Client(account_sid, auth_token)
+
 
 
 app = Flask(__name__)
@@ -106,4 +104,5 @@ def dashboard():
         
 app.run(debug=True)
        
+
     
